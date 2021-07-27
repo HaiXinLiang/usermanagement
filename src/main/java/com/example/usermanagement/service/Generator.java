@@ -28,7 +28,7 @@ public class Generator {
 
     public String getNationalityByName(String name) {
         var uriNationality = "https://api.nationalize.io/?name=" + name;
-        var resultForNationality = restTemplate.getForObject(uriNationality, Countries.class);
+        var resultForNationality = Optional.ofNullable(restTemplate.getForObject(uriNationality, Countries.class)).get();
         var nationality = resultForNationality.getCountry().stream().map(Country::getCountry_id).findFirst().get();
         return nationality;
     }
