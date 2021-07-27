@@ -1,53 +1,50 @@
 package com.example.usermanagement.service;
 
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
-
 import java.util.List;
 
-@Configurable
 public class CustomPage <T> {
-    List<T> content;
-    CustomPageable pageable;
-
-//    @Bean
-//    public CustomPage<T> CustomPage(Page<T> page){
-//        return new CustomPage<T>(page);
-//    }
-
+    int page;
+    int pageSize;
+    long totalPage;
+    List<T> users;
 
     public CustomPage(Page<T> page){
-        this.content = page.getContent();
-        this.pageable = new CustomPageable(page.getPageable().getPageNumber(), page.getPageable().getPageSize(),page.getTotalElements());
+        this.page = page.getPageable().getPageNumber() + 1;
+        this.pageSize = page.getPageable().getPageSize();
+        this.totalPage = page.getTotalElements();
+        this.users = page.getContent();
     }
 
-    private class CustomPageable {
-            int pageNumber;
-            int pageSize;
-            long totalElements;
-
-        public CustomPageable(int pageNumber, int pageSize, long totalElements) {
-                this.pageNumber = pageNumber;
-                this.pageSize = pageSize;
-                this.totalElements = totalElements;
-        }
+    public int getPage() {
+        return page;
     }
 
-
-    public List<T> getContent() {
-        return content;
+    public void setPage(int page) {
+        this.page = page;
     }
 
-    public void setContent(List<T> content) {
-        this.content = content;
+    public int getPageSize() {
+        return pageSize;
     }
 
-    public CustomPageable getPageable() {
-        return pageable;
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
     }
 
-    public void setPageable(CustomPageable pageable) {
-        this.pageable = pageable;
+    public long getTotalPage() {
+        return totalPage;
+    }
+
+    public void setTotalPage(long totalPage) {
+        this.totalPage = totalPage;
+    }
+
+    public List<T> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<T> users) {
+        this.users = users;
     }
 }

@@ -5,12 +5,16 @@ import com.example.usermanagement.service.bean.UserOut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Service
 public class UserManagementService {
@@ -19,14 +23,14 @@ public class UserManagementService {
 
     final static String STATUS_ACTIVE = "Active";
 
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     private Generator generator;
 
-    @Autowired
-    private CustomPage<User> customPage;
+    public UserManagementService(UserRepository userRepository, Generator generator) {
+        this.userRepository = userRepository;
+        this.generator = generator;
+    }
 
     public void addNewUser(User user) {
         user.setUsername(user.getEmail());
@@ -49,9 +53,9 @@ public class UserManagementService {
         if (userRepository.findById(user.getEmail()).isPresent()) {
             var dbUser = userRepository.findById(user.getEmail()).get();
             user.setUsername(user.getEmail());
-            user.setAge(dbUser.getAge());
-            user.setGender(dbUser.getGender());
-            user.setNationality(dbUser.getNationality());
+            user.setAge(generator.getAgeByName(user.getFirstName()));
+            user.setGender(generator.getGenderByName(user.getFirstName()));
+            user.setNationality(generator.getNationalityByName(user.getFirstName()));
             user.setStatus(dbUser.getStatus());
             user.setCreated(dbUser.getCreated());
             user.setUpdated(LocalDateTime.now());
@@ -75,8 +79,26 @@ public class UserManagementService {
         return userOut;
     }
 
-    public CustomPage<User> findPaginated(int pageNo, int pageSize){
+    public CustomPage<UserOut> findPaginated(int pageNo, int pageSize){
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
-        return new CustomPage<User>(userRepository.findAll(pageable));
+        var userOutList = userRepository.findAll().stream().map(
+                user -> new UserOut(
+                        user.getPassword(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getEmail(),
+                        user.getContactNumber(),
+                        user.getAge(),
+                        user.getGender(),
+                        user.getNationality(),
+                        user.getTags()))
+                .collect(Collectors.toList());
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), userOutList.size());
+        Page<UserOut> page
+                = new PageImpl<UserOut>(userOutList.subList(start,end), pageable, userOutList.size());
+
+        return new CustomPage<UserOut>(page);
     }
 }
