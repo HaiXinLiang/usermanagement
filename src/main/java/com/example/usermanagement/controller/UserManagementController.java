@@ -35,7 +35,9 @@ public class UserManagementController {
 
     @GetMapping("/api/user-management/user/list")
     @ResponseStatus(HttpStatus.OK)
-    public CustomPage<User> findPaginated(@RequestParam int page, @RequestParam int pageSize){
+    public CustomPage<User> findPaginated(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "15") int pageSize){
         return userService.findPaginated(page, pageSize);
     }
 

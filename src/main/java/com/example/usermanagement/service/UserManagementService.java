@@ -77,7 +77,6 @@ public class UserManagementService {
 
     public CustomPage<User> findPaginated(int pageNo, int pageSize){
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
-//        return new CustomPage<User>(userRepository.findAll(pageable));
-        return null;
+        return new CustomPage<User>(userRepository.findAll(pageable));
     }
 }
