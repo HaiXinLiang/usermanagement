@@ -4,8 +4,6 @@ import com.example.usermanagement.repository.UserRepository;
 import com.example.usermanagement.service.bean.UserOut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,9 +20,9 @@ public class UserManagementService {
 
     final static String STATUS_ACTIVE = "Active";
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private Generator generator;
+    private final Generator generator;
 
     public UserManagementService(UserRepository userRepository, Generator generator) {
         this.userRepository = userRepository;
@@ -46,7 +43,6 @@ public class UserManagementService {
     public void deleteUserByEmail(String email) {
         if (userRepository.findById(email).isPresent())
             userRepository.deleteById(email);
-        else return;
     }
 
     public void updateUser(User user) {
@@ -65,21 +61,23 @@ public class UserManagementService {
     }
 
     public UserOut getUser(String email) {
-        var dbUser = userRepository.findById(email).get();
-        var userOut = new UserOut(
-                dbUser.getPassword(),
-                dbUser.getFirstName(),
-                dbUser.getLastName(),
-                dbUser.getEmail(),
-                dbUser.getContactNumber(),
-                dbUser.getAge(),
-                dbUser.getGender(),
-                dbUser.getNationality(),
-                dbUser.getTags());
-        return userOut;
+        if(userRepository.findById(email).isPresent()) {
+            var dbUser = userRepository.findById(email).get();
+            return new UserOut(
+                    dbUser.getPassword(),
+                    dbUser.getFirstName(),
+                    dbUser.getLastName(),
+                    dbUser.getEmail(),
+                    dbUser.getContactNumber(),
+                    dbUser.getAge(),
+                    dbUser.getGender(),
+                    dbUser.getNationality(),
+                    dbUser.getTags());
+        } else
+            throw new EntityNotFoundException("User email: " + email + " cannot be found in the database");
     }
 
-    public CustomPage<UserOut> findPaginated(int pageNo, int pageSize){
+    public CustomPage<UserOut> paginateUserList(int pageNo, int pageSize){
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
         var userOutList = userRepository.findAll().stream().map(
                 user -> new UserOut(
@@ -96,9 +94,14 @@ public class UserManagementService {
 
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), userOutList.size());
-        Page<UserOut> page
-                = new PageImpl<UserOut>(userOutList.subList(start,end), pageable, userOutList.size());
+        PageImpl<UserOut> page;
+        if(start < end)
+            page = new PageImpl<>(userOutList.subList(start, end), pageable, userOutList.size());
+        else
+            throw new EntityNotFoundException("Page Not Existing");
 
-        return new CustomPage<UserOut>(page);
+        return new CustomPage<>(page);
     }
+
+
 }

@@ -1,7 +1,5 @@
 package com.example.usermanagement.service.bean;
 
-import java.util.ArrayList;
-
 public class UserOut {
 
     private String password; //from request
@@ -106,4 +104,5 @@ public class UserOut {
     public void setTags(String[] tags) {
         this.tags = tags;
     }
+
 }

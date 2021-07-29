@@ -12,7 +12,7 @@ import java.util.Optional;
 @Component
 public class Generator {
 
-    RestTemplate restTemplate = new RestTemplate();
+    private RestTemplate restTemplate = new RestTemplate();
 
     public int getAgeByName(String name) {
         var uriAge = "https://api.agify.io/?name=" + name;
@@ -29,7 +29,6 @@ public class Generator {
     public String getNationalityByName(String name) {
         var uriNationality = "https://api.nationalize.io/?name=" + name;
         var resultForNationality = Optional.ofNullable(restTemplate.getForObject(uriNationality, Countries.class)).get();
-        var nationality = resultForNationality.getCountry().stream().map(Country::getCountry_id).findFirst().get();
-        return nationality;
+        return resultForNationality.getCountry().stream().map(Country::getCountry_id).findFirst().get();
     }
 }
