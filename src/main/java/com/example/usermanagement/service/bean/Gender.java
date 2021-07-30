@@ -11,5 +11,9 @@ public class Gender {
         return gender;
     }
 
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
 
 }

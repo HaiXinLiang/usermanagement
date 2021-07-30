@@ -26,31 +26,16 @@ public class CustomPage <T> {
         return page;
     }
 
-    public void setPage(int page) {
-        this.page = page;
-    }
-
     public int getPageSize() {
         return pageSize;
-    }
-
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
     }
 
     public long getTotalPage() {
         return totalPage;
     }
 
-    public void setTotalPage(long totalPage) {
-        this.totalPage = totalPage;
-    }
-
     public List<T> getUsers() {
         return users;
     }
 
-    public void setUsers(List<T> users) {
-        this.users = users;
-    }
 }

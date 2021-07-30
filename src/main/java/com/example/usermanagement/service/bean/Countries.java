@@ -16,4 +16,8 @@ public class Countries {
         return country;
     }
 
+    public void setCountry(List<Country> country) {
+        this.country = country;
+    }
+
 }
