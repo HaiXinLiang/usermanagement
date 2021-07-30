@@ -8,6 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
@@ -92,9 +94,8 @@ class UserManagementServiceTest {
         String expectedMessage = "User email: " + user.getEmail() + " cannot be found in the database";
         String actualMessage = exception.getMessage();
 
-        assertEquals(actualMessage, expectedMessage);
+        assertEquals(expectedMessage, actualMessage);
     }
-
     @Test
     void testGetExistingUser() {
         var dbUser = new User();

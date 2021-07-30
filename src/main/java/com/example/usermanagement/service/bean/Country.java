@@ -1,9 +1,6 @@
 package com.example.usermanagement.service.bean;
 
 public class Country {
-
-
-
     private String country_id;
     private float probability;
 

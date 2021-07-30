@@ -35,6 +35,8 @@ public class UserManagementService {
         user.setGender(generator.getGenderByName(user.getFirstName()));
         user.setNationality(generator.getNationalityByName(user.getFirstName()));
         user.setStatus(STATUS_ACTIVE);
+
+        LocalDateTime now = LocalDateTime.now();
         user.setCreated(LocalDateTime.now());
         user.setUpdated(LocalDateTime.now());
         userRepository.save(user);

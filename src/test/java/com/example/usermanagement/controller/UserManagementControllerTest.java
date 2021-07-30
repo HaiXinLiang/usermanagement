@@ -7,9 +7,7 @@ import com.example.usermanagement.service.bean.UserOut;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -17,9 +15,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.isA;
@@ -30,8 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(controllers = UserManagementController.class)
-@ExtendWith(SpringExtension.class)
-@ExtendWith(MockitoExtension.class)
 class UserManagementControllerTest {
 
     @Autowired
@@ -73,6 +69,14 @@ class UserManagementControllerTest {
         this.mockMvc.perform(delete("/api/user-management/user/{email}",userOut.getEmail())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void testDeleteNonExistingUser() throws Exception {
+        doThrow(new EntityNotFoundException()).when(userServiceMock).deleteUserByEmail(userOut.getEmail());
+        this.mockMvc.perform(delete("/api/user-management/user/{email}",userOut.getEmail())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
