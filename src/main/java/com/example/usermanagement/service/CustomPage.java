@@ -14,7 +14,6 @@ public class CustomPage <T> {
         this.pageSize = page.getPageable().getPageSize();
         this.totalPage = getPageNumber(page);
         this.users = page.getContent();
-
     }
 
     private long getPageNumber(Page<T> page) {

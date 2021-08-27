@@ -1,7 +1,6 @@
 package com.example.usermanagement.exception;
 
 import org.springframework.http.HttpStatus;
-
 import java.time.LocalDateTime;
 
 public class ApiException {

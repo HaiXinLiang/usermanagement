@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -22,34 +23,37 @@ class GeneratorTest {
     @Mock
     private RestTemplate restTemplateMock = new RestTemplate();
 
+    private  ExecutorService executorService = Executors.newFixedThreadPool(3);
+
     @InjectMocks
-    private Generator generatorMock;
+    private Generator generator;
 
     @BeforeEach
     public void setupMock() {
         MockitoAnnotations.openMocks(this);
+        generator = new Generator(restTemplateMock, executorService);
     }
 
     @Test
-    void testGetAgeByName() {
+    void testGetAgeByName() throws ExecutionException, InterruptedException, TimeoutException {
         var age = new Age();
         age.setAge(45);
-        when(restTemplateMock.getForObject("https://api.agify.io/?name=fistName", Age.class)).thenReturn(age);
-        var actualAge = generatorMock.getAgeByName("fistName");
+        when(restTemplateMock.getForObject("https://api.agify.io/?name=firstName", Age.class)).thenReturn(age);
+        var actualAge = generator.getAgeByName("firstName").get();
         assertEquals(age.getAge(),actualAge);
     }
 
     @Test
-    void testGetGenderByName() {
+    void testGetGenderByName() throws ExecutionException, InterruptedException {
         var gender = new Gender();
         gender.setGender("female");
-        when(restTemplateMock.getForObject("https://api.genderize.io?name=fistName", Gender.class)).thenReturn(gender);
-        var actualGender = generatorMock.getGenderByName("fistName");
+        when(restTemplateMock.getForObject("https://api.genderize.io?name=firstName", Gender.class)).thenReturn(gender);
+        var actualGender = generator.getGenderByName("firstName").get();
         assertEquals(gender.getGender(),actualGender);
     }
 
     @Test
-    void testGetNationalityByName() {
+    void testGetNationalityByName() throws ExecutionException, InterruptedException {
         var countries = new Countries();
         var country1 = new Country();
         var country2 = new Country();
@@ -60,7 +64,7 @@ class GeneratorTest {
         countries.setCountry(countryList);
 
         when(restTemplateMock.getForObject("https://api.nationalize.io/?name=firstName", Countries.class)).thenReturn(countries);
-        var actualNationality = generatorMock.getNationalityByName("firstName");
+        var actualNationality = generator.getNationalityByName("firstName").get();
         assertEquals(countries.getCountry().get(0).getCountry_id(), actualNationality);
     }
 }

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.ExecutionException;
+
 
 @RestController
 public class UserManagementController {
@@ -17,7 +19,7 @@ public class UserManagementController {
 
     @PostMapping("/api/user-management/user")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addNewUser(@RequestBody User user) {
+    public void addNewUser(@RequestBody User user) throws ExecutionException, InterruptedException {
         userService.addNewUser(user);
     }
 
@@ -29,7 +31,7 @@ public class UserManagementController {
 
     @PutMapping("/api/user-management/user")
     @ResponseStatus(HttpStatus.OK)
-    public void updateUser(@RequestBody User user){
+    public void updateUser(@RequestBody User user) throws ExecutionException, InterruptedException {
         userService.updateUser(user);
     }
 

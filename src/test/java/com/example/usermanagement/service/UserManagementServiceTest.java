@@ -6,15 +6,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -44,12 +45,18 @@ class UserManagementServiceTest {
     }
 
     @Test
-    void testAddNewUser() {
-        when(generatorMock.getAgeByName(user.getFirstName())).thenReturn(34);
-        when(generatorMock.getGenderByName(user.getFirstName())).thenReturn("male");
-        when(generatorMock.getNationalityByName(user.getFirstName())).thenReturn("TH");
-        when(userRepositoryMock.save(user)).thenReturn(user);
+    void testAddNewUser() throws ExecutionException, InterruptedException {
+        Future<Integer> mockFutureAge = Mockito.mock(Future.class);
+        Future<String> mockFutureGender = Mockito.mock(Future.class);
+        Future<String> mockFutureNationality = Mockito.mock(Future.class);
+        when(generatorMock.getAgeByName(anyString())).thenReturn(mockFutureAge);
+        when(generatorMock.getGenderByName(anyString())).thenReturn(mockFutureGender);
+        when(generatorMock.getNationalityByName(anyString())).thenReturn(mockFutureNationality);
+        when(mockFutureAge.get()).thenReturn(34);
+        when(mockFutureGender.get()).thenReturn("male");
+        when(mockFutureNationality.get()).thenReturn("TH");
 
+        when(userRepositoryMock.save(user)).thenReturn(user);
         userManagementService.addNewUser(user);
 
         assertEquals(user.getUsername(),user.getEmail());
@@ -74,11 +81,17 @@ class UserManagementServiceTest {
     }
 
     @Test
-    void testUpdateExistingUser() {
+    void testUpdateExistingUser() throws ExecutionException, InterruptedException {
         when(userRepositoryMock.findById(user.getEmail())).thenReturn(Optional.of(user));
-        when(generatorMock.getAgeByName(user.getFirstName())).thenReturn(38);
-        when(generatorMock.getGenderByName(user.getFirstName())).thenReturn("male");
-        when(generatorMock.getNationalityByName(user.getFirstName())).thenReturn("GE");
+        Future<Integer> mockFutureAge = Mockito.mock(Future.class);
+        Future<String> mockFutureGender = Mockito.mock(Future.class);
+        Future<String> mockFutureNationality = Mockito.mock(Future.class);
+        when(generatorMock.getAgeByName(user.getFirstName())).thenReturn(mockFutureAge);
+        when(generatorMock.getGenderByName(user.getFirstName())).thenReturn(mockFutureGender);
+        when(generatorMock.getNationalityByName(user.getFirstName())).thenReturn(mockFutureNationality);
+        when(mockFutureAge.get()).thenReturn(34);
+        when(mockFutureGender.get()).thenReturn("male");
+        when(mockFutureNationality.get()).thenReturn("TH");
         when(userRepositoryMock.save(user)).thenReturn(user);
         userManagementService.updateUser(user);
 

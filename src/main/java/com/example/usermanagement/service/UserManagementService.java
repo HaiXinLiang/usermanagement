@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,11 +30,11 @@ public class UserManagementService {
         this.generator = generator;
     }
 
-    public void addNewUser(User user) {
+    public void addNewUser(User user) throws ExecutionException, InterruptedException {
         user.setUsername(user.getEmail());
-        user.setAge(generator.getAgeByName(user.getFirstName()));
-        user.setGender(generator.getGenderByName(user.getFirstName()));
-        user.setNationality(generator.getNationalityByName(user.getFirstName()));
+        user.setAge(generator.getAgeByName(user.getFirstName()).get());
+        user.setGender(generator.getGenderByName(user.getFirstName()).get());
+        user.setNationality(generator.getNationalityByName(user.getFirstName()).get());
         user.setStatus(STATUS_ACTIVE);
 
         LocalDateTime now = LocalDateTime.now();
@@ -47,13 +48,13 @@ public class UserManagementService {
             userRepository.deleteById(email);
     }
 
-    public void updateUser(User user) {
+    public void updateUser(User user) throws ExecutionException, InterruptedException {
         if (userRepository.findById(user.getEmail()).isPresent()) {
             var dbUser = userRepository.findById(user.getEmail()).get();
             user.setUsername(user.getEmail());
-            user.setAge(generator.getAgeByName(user.getFirstName()));
-            user.setGender(generator.getGenderByName(user.getFirstName()));
-            user.setNationality(generator.getNationalityByName(user.getFirstName()));
+            user.setAge(generator.getAgeByName(user.getFirstName()).get());
+            user.setGender(generator.getGenderByName(user.getFirstName()).get());
+            user.setNationality(generator.getNationalityByName(user.getFirstName()).get());
             user.setStatus(dbUser.getStatus());
             user.setCreated(dbUser.getCreated());
             user.setUpdated(LocalDateTime.now());

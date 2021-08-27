@@ -6,8 +6,6 @@ import org.springframework.http.HttpStatus;
 import javax.persistence.EntityNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 class ApiExceptionHandlerTest {
 
     @Test
